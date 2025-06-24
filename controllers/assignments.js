@@ -116,17 +116,14 @@ router.put('/:assignmentId', verifyToken, async (req, res) => {
         const updatedAssignment = await Assignment.findByIdAndUpdate(req.params.assignmentId, req.body,
             { new: true }
         );
-
+        updatedAssignment._doc.teacher = req.user;
         // Add a JSON response with the updated assignment
+
         res.status(200).json(updatedAssignment);
     } catch (err) {
-        // Add code for errors
-        if (res.statusCode === 404) {
-            res.json({ err: err.message });
-        } else {
-            res.status(500).json({ err: err.message });
-        }
+        res.status(500).json({ err: err.message });
     }
+
 });
 
 
