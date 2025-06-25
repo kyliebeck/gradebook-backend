@@ -5,7 +5,7 @@ const app = express();
 const mongoose = require('mongoose');
 const logger = require('morgan');
 const cors = require('cors');
-
+const port = process.env.PORT || 3000
 // Import the controller file
 const assignmentRouter = require('./controllers/assignments.js');
 const studentRouter = require('./controllers/students.js')
@@ -18,7 +18,7 @@ mongoose.connection.on('connected', () => {
     console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
 });
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(express.json());
 app.use(logger('dev'));
 
@@ -29,6 +29,6 @@ app.use('/auth', authRouter);
 app.use('/users', usersRouter)
 
 
-app.listen(3000, () => {
-    console.log('The express app is ready!');
+app.listen(port, () => {
+    console.log(`App listening on port ${port}`);
 });
