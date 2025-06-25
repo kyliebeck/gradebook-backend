@@ -15,19 +15,18 @@ router.post('/', verifyToken, async (req, res) => {
         // iterate through array of students
         const createdAssignments = [];
         for (const student of students) {
-            // console.log("student", student)
+
             const createdAssignment = await Assignment.create(
                 {
                     ...req.body,
-                    student: student._id,
+                    student: student._id
 
                 }
             );
-            // console.log("created assignment", createdAssignment)
             createdAssignments.push(createdAssignment)
         }
         // for each student, create an assignment where the student property on the assignment is the student._id of the loop
-        // console.log("created assignments", createdAssignments)
+
         res.status(201).json(createdAssignments); // 201 Created
     } catch (err) {
         // Setup for error handling
@@ -115,7 +114,7 @@ router.put('/:assignmentId', verifyToken, async (req, res) => {
         // update the assignment
         const updatedAssignment = await Assignment.findByIdAndUpdate(req.params.assignmentId, req.body,
             { new: true }
-        );
+        ).populate('teacher student');
         updatedAssignment._doc.teacher = req.user;
         // Add a JSON response with the updated assignment
 

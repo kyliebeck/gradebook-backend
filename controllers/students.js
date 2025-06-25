@@ -22,8 +22,6 @@ router.get('/', verifyToken, async (req, res) => {
             teacher: req.user._id
         })
             .populate("teacher")
-        console.log("req user id", req.user._id)
-        console.log("found students", foundStudents)
         res.status(200).json(foundStudents);
 
     } catch (err) {
