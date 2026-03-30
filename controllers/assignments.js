@@ -7,29 +7,32 @@ const Student = require('../models/student.js');
 
 router.post('/', verifyToken, async (req, res) => {
     try {
-        req.body.teacher = req.user._id;
-        // get all students whose teacher property is the logged in user(look at getAll students controller)
+
         const students = await Student.find({
             teacher: req.user._id
-        })
-        // iterate through array of students
+        });
+
         const createdAssignments = [];
+
         for (const student of students) {
 
-            const createdAssignment = await Assignment.create(
-                {
-                    ...req.body,
-                    student: student._id
+            const createdAssignment = await Assignment.create({
+                ...req.body,
+                teacher: req.user._id,
+                student: student._id
+            });
 
-                }
-            );
-            createdAssignments.push(createdAssignment)
+            const populatedAssignment = await createdAssignment.populate([
+                'student',
+                'teacher'
+            ]);
+
+            createdAssignments.push(populatedAssignment);
         }
-        // for each student, create an assignment where the student property on the assignment is the student._id of the loop
 
-        res.status(201).json(createdAssignments); // 201 Created
+        res.status(201).json(createdAssignments);
+
     } catch (err) {
-        // Setup for error handling
         console.error(err)
         res.status(500).json({ err: err.message });
     }
@@ -69,6 +72,33 @@ router.get('/:assignmentId', verifyToken, async (req, res) => {
             // Add else statement to handle all other errors
             res.status(500).json({ err: err.message });
         }
+    }
+});
+
+router.delete('/group-delete', verifyToken, async (req, res) => {
+    try {
+
+        const { title, subject, assignmentType } = req.body;
+
+        const deletedAssignments = await Assignment.find({
+            teacher: req.user._id,
+            title,
+            subject,
+            assignmentType
+        });
+
+        await Assignment.deleteMany({
+            teacher: req.user._id,
+            title,
+            subject,
+            assignmentType
+        });
+
+        res.status(200).json(deletedAssignments);
+
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ err: err.message })
     }
 });
 
@@ -124,6 +154,8 @@ router.put('/:assignmentId', verifyToken, async (req, res) => {
     }
 
 });
+
+
 
 
 
